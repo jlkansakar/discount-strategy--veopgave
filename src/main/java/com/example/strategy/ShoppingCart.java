@@ -2,9 +2,15 @@ package com.example.strategy;
 
 public class ShoppingCart {
     private double totalPrice;
+    private DiscountStrategy discountStrategy;
 
-    public ShoppingCart() {
+    public ShoppingCart(DiscountStrategy discountStrategy) {
         this.totalPrice = 0.0;
+        this.discountStrategy = discountStrategy;
+    }
+
+    public void changeDiscount(DiscountStrategy discountStrategy) {
+        this.discountStrategy = discountStrategy;
     }
 
     public void addItem(String itemName, double price) {
@@ -12,6 +18,7 @@ public class ShoppingCart {
         totalPrice += price;
     }
 
+    /*
     public double applyDiscount(double price, String discountType, double discountValue) {
         switch (discountType.toLowerCase()) {
             case "percentage":
@@ -23,9 +30,10 @@ public class ShoppingCart {
                 return price;
         }
     }
+    */
 
     public double calculateTotal() {
-        return applyDiscount(totalPrice, "none", 0);
+        return this.discountStrategy.applyDiscount(totalPrice);
     }
 
     public void checkout() {
