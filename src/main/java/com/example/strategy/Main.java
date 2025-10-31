@@ -4,7 +4,7 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("=== Shopping Cart Demo (Before Strategy Pattern Refactoring) ===\n");
 
-        ShoppingCart cart = new ShoppingCart();
+        ShoppingCart cart = new ShoppingCart(new NoDiscount());
 
         cart.addItem("Laptop", 999.99);
         cart.addItem("Mouse", 29.99);
@@ -15,8 +15,16 @@ public class Main {
         cart.addItem("Laptop", 999.99);
         cart.addItem("Mouse", 29.99);
 
-        System.out.println("--- 10% Discount (hardcoded) ---");
+        System.out.println("Pris uden rabat");
+    
         double total = cart.calculateTotal();
+
+        system.out.println("Pris med 10% rabat");
+
+        cart.changeDiscount(new Percentage(0.10));
+        double percentageTotal = cart.calculateTotal();
+        cart.checkout();
+
         double discountedTotal = cart.applyDiscount(total, "percentage", 10);
         System.out.printf("Original Total: $%.2f%n", total);
         System.out.printf("With 10%% discount: $%.2f%n", discountedTotal);
