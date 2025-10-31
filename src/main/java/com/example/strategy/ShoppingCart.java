@@ -1,15 +1,10 @@
 package com.example.strategy;
 
 public class ShoppingCart {
-    private DiscountStrategy discountStrategy;
     private double totalPrice;
 
     public ShoppingCart() {
         this.totalPrice = 0.0;
-    }
-
-    public void setDiscountStrategy(DiscountStrategy strategy) {
-        this.discountStrategy = strategy;
     }
 
     public void addItem(String itemName, double price) {
@@ -17,33 +12,31 @@ public class ShoppingCart {
         totalPrice += price;
     }
 
-    public double calculateTotal() {
-        if (discountStrategy == null) {
-            return totalPrice;
+    public double applyDiscount(double price, String discountType, double discountValue) {
+        switch (discountType.toLowerCase()) {
+            case "percentage":
+                return price * (1 - discountValue / 100);
+            case "fixed":
+                return Math.max(0, price - discountValue);
+            case "none":
+            default:
+                return price;
         }
-        return discountStrategy.applyDiscount(totalPrice);
+    }
+
+    public double calculateTotal() {
+        return applyDiscount(totalPrice, "none", 0);
     }
 
     public void checkout() {
         double originalTotal = totalPrice;
         double finalTotal = calculateTotal();
-        double savedAmount = originalTotal - finalTotal;
 
         System.out.println("\n=== CHECKOUT ===");
         System.out.printf("Subtotal: $%.2f%n", originalTotal);
-
-        if (discountStrategy != null) {
-            System.out.printf("Discount (%s): -$%.2f%n",
-                    discountStrategy.getStrategyName(), savedAmount);
-        }
-
         System.out.printf("Total: $%.2f%n", finalTotal);
         System.out.println("================\n");
 
         totalPrice = 0.0;
-    }
-
-    public String getDiscountStrategyName() {
-        return discountStrategy != null ? discountStrategy.getStrategyName() : "No discount";
     }
 }

@@ -1,38 +1,28 @@
-# Strategy Pattern Exercise
+# Strategy Pattern Øvelse
 
-A simple Java 21 exercise demonstrating the Strategy Design Pattern using discount strategies for a shopping cart.
+En refaktoriseringsøvelse hvor man skal transformere tæt-koblet rabatlogik med
+Strategy Pattern.
 
-## Overview
+Omskriv den nuværende `ShoppingCart` klasse til at bruge Strategy Pattern
+i stedet for at have rabatlogik direkte indlejret.
 
-This exercise focuses on the core Strategy pattern mechanics without algorithmic complexity. Students learn how to:
+`ShoppingCart` klassen indeholder hardcoded rabatlogik ved brug af switch
+statements.  Dette overtræder Open/Closed-princippet og gør det svært at
+tilføje nye rabattyper eller teste rabatlogik uafhængigt.
 
-- Define a strategy interface
-- Implement concrete strategies with simple logic
-- Use a context class to switch strategies at runtime
-- See immediate, understandable results
+**Din Opgave**:
+1. Opret konkrete implementeringer af `DiscountStrategy` interfacet
+2. Omskriv `ShoppingCart` til at bruge strategy objekter i stedet for
+   `applyDiscount()` metoden
+3. Opdater `Main` klassen til at demonstrere runtime strategy skift
 
-## Project Structure
+## Hvad er Open/Closed-princippet?
 
-```
-src/
-├── main/java/com/example/strategy/
-│   ├── DiscountStrategy.java      # Strategy interface
-│   ├── PercentageDiscount.java    # 10% off strategy
-│   ├── FixedAmountDiscount.java   # $X off strategy
-│   ├── LoyaltyPointsDiscount.java # Points-based with accumulation
-│   ├── Customer.java              # Simple customer with loyalty points
-│   ├── ShoppingCart.java          # Context class
-│   └── Main.java                  # Demo with multiple strategies
-└── test/java/
-    └── DiscountStrategyTest.java  # Unit tests
+Software enheder (klasser, moduler, funktioner) skal være åbne for udvidelse,
+men lukkede for modifikation. Det betyder, at du skal kunne tilføje ny
+funktionalitet uden at ændre eksisterende kode.
 
-route-strategy/                    # Advanced example (route planning)
-├── src/                          # Full implementation with GUI
-├── pom.xml                       # Separate Maven project
-└── README.md                     # Advanced strategy pattern demo
-```
-
-## Strategy Pattern Components
+## Strategy Pattern Komponenter
 
 ### 1. Strategy Interface
 ```java
@@ -42,12 +32,52 @@ public interface DiscountStrategy {
 }
 ```
 
-### 2. Concrete Strategies
-- **PercentageDiscount**: Simple percentage calculation
-- **FixedAmountDiscount**: Subtract fixed amount (minimum $0)
-- **LoyaltyPointsDiscount**: Earn points, redeem for discounts
+### 2. Konkrete Strategies (skal implementeres)
 
-### 3. Context Class
+Du skal oprette disse konkrete strategy klasser:
+
+- **PercentageDiscount**: Anvender en procentuel rabat (f.eks. 10% rabat)
+- **FixedAmountDiscount**: Trækker et fast beløb fra (minimum $0)
+- **LoyaltyPointsDiscount**: Kunde optjener og indløser loyalitetspoint til
+  rabatter
+
+Hver skal implementere `DiscountStrategy` interfacet og indeholde den specifikke
+rabatberegningslogik der i øjeblikket findes i `ShoppingCart.applyDiscount()`
+metoden.
+
+### 3. Kontekst-klasse
+
+Med "kontekst" menes der den klasse som benytter en strategy, og ikke selve
+strategy'en. Det er i vores tilfælde `ShoppingCart` der er konteksten. Det
+gælder for konteksten i Strategy Pattern at den...
+
+- vedligeholder en reference til et strategy-objekt
+- Delegerer arbejde til strategien i stedet for at implementere algoritmen
+  direkte
+- Tillader strategy skift ved runtime uden at ændre kontekstens kode
+- Leverer interfacet mellem klienten og strategien
+
+I vores indkøbskurv eksempel fungerer `ShoppingCart` klassen som konteksten.
+Den har i øjeblikket rabatlogik blandet direkte ind i sin kode, men bør
+omskrives til at bruge Strategy mønsteret:
+
+Før Strategy Pattern (nuværende tilstand):
+
+```java
+public class ShoppingCart {
+    // Rabatlogik er blandet ind i kontekstklassen
+    public double applyDiscount(double price, String discountType, double discountValue) {
+        switch (discountType) {
+            case "percentage": return price * (1 - discountValue / 100);
+            case "fixed": return Math.max(0, price - discountValue);
+            default: return price;
+        }
+    }
+}
+```
+
+Efter Strategy Pattern (mål):
+
 ```java
 public class ShoppingCart {
     private DiscountStrategy discountStrategy;
@@ -62,110 +92,50 @@ public class ShoppingCart {
 }
 ```
 
-## Running the Exercise
+Konteksten bliver meget renere og fokuseret på sit primære ansvar (håndtering
+af indkøbskurven) mens den delegerer rabatberegninger til strategy-objekter.
 
-### Prerequisites
-- Java 21
-- Maven 3.6+
+## Vigtige Læringspunkter
 
-### Build and Run
-```bash
-# Compile
-mvn compile
+### Strategy Pattern Fordele
+1. **Runtime Algoritmevalg**: Skift rabattyper uden at ændre kurvekode
+2. **Open/Closed Princip**: Nemt at tilføje nye rabatstrategier
+3. **Enkelt Ansvar**: Hver strategy håndterer én rabattype
+4. **Testbarhed**: Strategier kan testes uafhængigt af deres kontekst
 
-# Run demo
-mvn exec:java
+## Trin-for-trin instruktioner
 
-# Run tests
-mvn test
-```
+### Trin 1: analyser Nuværende Kode
 
-### Using Nix Shell
-```bash
-nix-shell
-mvn compile && mvn exec:java
-```
+Kør den nuværende `Main` klasse for at se hvordan rabatlogik er tæt koblet
+med `ShoppingCart` klassen.
 
-### Sample Output
-```
-=== Strategy Pattern Demo: Discount Strategies ===
+### Trin 2: Opret konkrete strategy klasser
 
-Customer: Alice (0 points)
+1. Opret `PercentageDiscount.java` - implementer procentbaserede rabatter
+2. Opret `FixedAmountDiscount.java` - implementer faste beløbsrabatter
+3. Opret `LoyaltyPointsDiscount.java` - implementer loyalitetspoint system
 
-Added Laptop: $999.99
-Added Mouse: $29.99
+### Trin 3: Omskriv shoppingCart
 
---- No Discount Strategy ---
-=== CHECKOUT ===
-Subtotal: $1029.98
-Total: $1029.98
-================
+1. Fjern `applyDiscount()` metoden fra `ShoppingCart`
+2. Tilføj et `DiscountStrategy` felt og setter metode
+3. Opdater `calculateTotal()` til at delegere til strategien
+4. Erstat hardcodede rabatkald med strategy-objekter
 
---- 10% Discount Strategy ---
-=== CHECKOUT ===
-Subtotal: $1029.98
-Discount (10% Discount): -$103.00
-Total: $926.98
-================
+### Trin 5: Test din løsning
 
---- Loyalty Points Strategy (First Purchase) ---
-Customer before: Alice (0 points)
-=== CHECKOUT ===
-Subtotal: $1029.98
-Total: $1029.98
-================
-Customer after: Alice (1029 points)
+Kør den omskrevne kode og verificer at:
+- Alle rabattyper virker korrekt
+- Strategier kan skiftes ved runtime
+- `ShoppingCart` klassen er nu kun fokuseret på kurvehåndtering
 
---- Loyalty Points Strategy (Second Purchase) ---
-Customer before: Alice (1029 points)
-=== CHECKOUT ===
-Subtotal: $379.98
-Discount (Loyalty Points): -$10.00
-Total: $369.98
-================
-Customer after: Alice (1299 points)
-```
+Skriv en test for hver strategy-objekt! Brug AI om nødvendigt.
 
-## Key Learning Points
+## Udvidelsesøvelser
 
-### Strategy Pattern Benefits
-1. **Runtime Algorithm Selection**: Switch discount types without changing cart code
-2. **Open/Closed Principle**: Easy to add new discount strategies
-3. **Single Responsibility**: Each strategy handles one discount type
-4. **Testability**: Strategies can be tested independently
+Når du har gennemført den grundlæggende omskrivning:
 
-### Why This Exercise Works
-- **Simple Logic**: 1-3 lines per strategy implementation
-- **Immediate Results**: See dollar amounts change with different strategies
-- **Real-World Scenario**: Everyone understands shopping discounts
-- **Progressive Complexity**: Simple → loyalty points → advanced route planning
-
-## Exercise Ideas
-
-1. **Add New Strategies**:
-   - Student discount (with ID verification)
-   - Buy-one-get-one discount
-   - Seasonal discount with date checking
-
-2. **Extend Loyalty Points**:
-   - Different point earning rates for different customer tiers
-   - Multiple redemption levels (50 points = $5, 100 points = $12)
-
-3. **Strategy Combination**:
-   - Apply multiple discounts in sequence
-   - Choose best discount for customer
-
-4. **Configuration**:
-   - Load discount rules from properties file
-   - Admin interface to modify discount parameters
-
-## Advanced Example
-
-For a more complex Strategy pattern demonstration with algorithms and GUI visualization, see the `route-strategy/` directory which contains a complete route planning application.
-
-## Code Quality Features
-
-- **Java 21**: Modern Java features
-- **Clean Code**: Simple, readable implementations
-- **Comprehensive Tests**: Unit tests for all strategies
-- **Exercise-First**: Focus on pattern mechanics, not complex domain logic
+1. **Tilføj Nye Strategier**: Studenterabat, sæsonrabat, køb-en-få-en
+2. **Strategy Kombination**: Anvend flere rabatter eller vælg den bedste
+3. **Konfiguration**: Indlæs rabatregler fra en properties fil
