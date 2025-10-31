@@ -20,11 +20,18 @@ public class Main {
     
         double total = cart.calculateTotal();
 
-        system.out.println("Pris med 10% rabat");
+        System.out.println("Pris med 10% rabat");
 
         cart.changeDiscount(new Percentage(0.10));
         double percentageTotal = cart.calculateTotal();
         cart.checkout();
+
+        System.out.println("Pris med flad rabat");
+
+        cart.changeDiscount(new FlatDiscount(700));
+        double flatRateTotal = cart.calculateTotal();
+        cart.checkout();
+
 
         double discountedTotal = cart.applyDiscount(total, "percentage", 10);
         System.out.printf("Original Total: $%.2f%n", total);

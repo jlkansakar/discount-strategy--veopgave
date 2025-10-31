@@ -18,6 +18,7 @@ public class Customer {
     }
 
     public void addLoyaltyPoints(int points) {
+        assert points >= 0;
         this.loyaltyPoints += points;
     }
 
