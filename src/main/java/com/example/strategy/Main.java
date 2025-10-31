@@ -5,6 +5,7 @@ public class Main {
         System.out.println("=== Shopping Cart Demo (Before Strategy Pattern Refactoring) ===\n");
 
         ShoppingCart cart = new ShoppingCart(new NoDiscount());
+        ShoppingCart cart = new ShoppingCart(new NoDiscount());
 
         cart.addItem("Laptop", 999.99);
         cart.addItem("Mouse", 29.99);
@@ -33,11 +34,6 @@ public class Main {
         cart.addItem("Laptop", 999.99);
         cart.addItem("Mouse", 29.99);
 
-        System.out.println("--- $50 Fixed Discount (hardcoded) ---");
-        total = cart.calculateTotal();
-        discountedTotal = cart.applyDiscount(total, "fixed", 50);
-        System.out.printf("Original Total: $%.2f%n", total);
-        System.out.printf("With $50 discount: $%.2f%n", discountedTotal);
         cart.checkout();
 
         System.out.println("\n=== Nuværende Problemer ===");

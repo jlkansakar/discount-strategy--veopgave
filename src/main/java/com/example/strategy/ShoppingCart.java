@@ -31,6 +31,7 @@ public class ShoppingCart {
         }
     }
     */
+    */
 
     public double calculateTotal() {
         return this.DiscountStrategy.applyDiscount(totalPrice);
