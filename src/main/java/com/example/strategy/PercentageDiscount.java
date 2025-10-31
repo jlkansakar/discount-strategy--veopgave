@@ -11,7 +11,7 @@ public class PercentageDiscount implements DiscountStrategy {
 
     @Override
     public double applyDiscount(double price) {
-        return price * this.percentage;
+        return price * (1 - this.percentage);
     }
 
     public String getStrategyName() {
